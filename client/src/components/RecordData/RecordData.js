@@ -5,8 +5,10 @@ import { Input, SubmitBtn } from "../../components/Form";
 import {useHistory, useParams } from 'react-router-dom'
 import RecordTransectName from "./RecordTransectName"
 import { HitInputSelect } from "./HitInputSelect"
+import { HitInputSelect2 } from "./HitInputSelect2"
 import { GroundInputSelect } from "./GroundInputSelect"
 import PointInput from "./PointInput"
+import SecondHit from "./SecondHit"
 
 
 
@@ -41,6 +43,8 @@ const RecordData = () => {
         secondHit: ""
     })
 
+    //hook for list of second hit values
+     const [secondHits, setSecondHits] = useState([]);
 
 
     //use the species list for the dropdowns and display the transectName on the page once the component mounts 
@@ -200,13 +204,25 @@ const RecordData = () => {
                 </div>
                 <div className="form-group">
                     <label>second hit</label>
-                    <HitInputSelect
+                    <HitInputSelect2
                     value={pointFormObject.secondHit}
                     name="secondHit"
                     className="form-control"
                     id="secondHit"
                     onChange={handleInputChange}
-                    ></HitInputSelect>
+                    ></HitInputSelect2>
+                </div>
+                <div className="form-group">
+                    <SecondHit
+                    onSubmit={text => setSecondHits([{text}, ...secondHits])}
+                    />
+                </div>
+                <div>
+                    {
+                        secondHits.map(({text}) => (
+                            <div key={text}>{text}</div>
+                        ))
+                    }
                 </div>
             </div>
         </div>
