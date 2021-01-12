@@ -30,10 +30,10 @@ if (process.env.NODE_ENV === 'production') {
     app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'client', 'build', 'index.html')));
 }
 
-// Connect to the Mongo DB
+// Connect to the Mongo DB  --- switch between these options for dev vs production
 mongoose.connect("mongodb://localhost/point-intercept");
-//
-//process.env.MONGODB_URI
+//development: "mongodb://localhost/point-intercept"
+//production: process.env.MONGODB_URI
 
 // start the server
 app.listen(PORT, function () {

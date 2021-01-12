@@ -5,10 +5,9 @@ import { Input, SubmitBtn } from "../../components/Form";
 import {useHistory, useParams } from 'react-router-dom'
 import RecordTransectName from "./RecordTransectName"
 import { HitInputSelect } from "./HitInputSelect"
-import { HitInputSelect2 } from "./HitInputSelect2"
 import { GroundInputSelect } from "./GroundInputSelect"
 import PointInput from "./PointInput"
-import SecondHit from "./SecondHit"
+import MultiSpeciesList from "./MultiSpeciesList";
 
 
 
@@ -32,6 +31,7 @@ const RecordData = () => {
 
     //hook for state where transect name is displayed
     const [transect, setTransect] =useState([])
+    
     //hook for state of point data form
     const [pointFormObject, setPointFormObject] = useState({
         point: "0",
@@ -42,9 +42,6 @@ const RecordData = () => {
         firstHit: "",
         secondHit: ""
     })
-
-    //hook for list of second hit values
-     const [secondHits, setSecondHits] = useState([]);
 
 
     //use the species list for the dropdowns and display the transectName on the page once the component mounts 
@@ -202,28 +199,13 @@ const RecordData = () => {
                     onChange={handleInputChange}
                     ></HitInputSelect>
                 </div>
+                
                 <div className="form-group">
-                    <label>second hit</label>
-                    <HitInputSelect2
-                    value={pointFormObject.secondHit}
-                    name="secondHit"
-                    className="form-control"
-                    id="secondHit"
-                    onChange={handleInputChange}
-                    ></HitInputSelect2>
+                    <label>second hit(s)</label>
+                    <MultiSpeciesList />
+                
                 </div>
-                <div className="form-group">
-                    <SecondHit
-                    onSubmit={text => setSecondHits([{text}, ...secondHits])}
-                    />
-                </div>
-                <div>
-                    {
-                        secondHits.map(({text}) => (
-                            <div key={text}>{text}</div>
-                        ))
-                    }
-                </div>
+
             </div>
         </div>
         <div className="row">
