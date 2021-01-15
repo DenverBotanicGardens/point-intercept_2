@@ -7,13 +7,10 @@ import RecordTransectName from "./RecordTransectName"
 import { HitInputSelect } from "./HitInputSelect"
 import { GroundInputSelect } from "./GroundInputSelect"
 import PointInput from "./PointInput"
-import MultiSpeciesList from "./MultiSpeciesList";
 
 
-
-
-//get list of values for hit dropdown
-// const hitValues = HitValues
+//array to contain all values for second hits
+const secondHitsArr = []
 
 const RecordData = () => {
 
@@ -22,12 +19,6 @@ const RecordData = () => {
 
     const history = useHistory()
 
-
-
-    //setting component's initial state
-    //hook for initializing hit list (combo box for hit1 and hit2)
-    // const [firstHitState, setFirstHit] =useState()
-    // const [secondHitState, setSecondHit] =useState()
 
     //hook for state where transect name is displayed
     const [transect, setTransect] =useState([])
@@ -40,13 +31,21 @@ const RecordData = () => {
         shrubDensity: "",
         canopyScore: "",
         firstHit: "",
-        secondHit: ""
+    })
+
+    //hook for state of second hit input
+    const [secondHitInput, setSecondHitInput] = useState({
+        secondHits: []
+    })
+    
+    //hook for state of second hit array
+    const [secondHits, setSecondHits] = useState({
+        secondHits: []
     })
 
 
-    //use the species list for the dropdowns and display the transectName on the page once the component mounts 
+    //display the transectName on the page once the component mounts 
     useEffect(() => {
- 
         //GET Method for pulling transect name
         API.getTransectById(_id)
         .then(res => {
@@ -55,62 +54,58 @@ const RecordData = () => {
         .catch(err => console.log(err))
     }, [])
 
-    //handles updating component state when user types into the input field
+    //handles updating component state when user types into the input fields
     function handleInputChange(event){
         console.log("inside handleinput", event.target.name, event.target.value)
         const { name, value } = event.target;
         setPointFormObject({...pointFormObject, [name]: value})
-        // if (name === "firstHit" || name === "secondHit"){
-        //     filterHits(value, name)
-        // }
     };
 
-    //funciton to filter the hit options
-    // function filterHits(searchTerm, name){
-    //     console.log('inside of filterHits', searchTerm, name)
-    //     //display all species in the list if there is nothing typed in
-    //     if (!searchTerm){
-    //         setFirstHit(firstHitState)
-    //         setSecondHit(secondHitState)
-    //     // if there is a search term typed in, apply the filter
-    //     }else {
-    //         if (name === "firstHit"){
-    //             //apply filter to firstHit hook
-    //             const searchInput = searchTerm.toLowerCase()
-    //             const filtered1 = HitList.filter(HitListResult => HitListResult.value.toLowerCase().startsWith(searchInput))
-    //             console.log(filtered1.value)
-    //             setFirstHit(filtered1.value)
-    //         }
-    //         else {
-    //             const searchInput = searchTerm.toLowerCase()
-    //             const filtered2 = HitList.filter(HitListResult => HitListResult.value.toLowerCase().startsWith(searchInput))
-    //             console.log(filtered2.value)
-    //             setSecondHit(filtered2.value)
-    //         }
+    //handles updating component state when user types into the SECOND HIT input field
+    function handleSecondHitChange(event){
+        console.log("inside handleSecondHitChange", event.target.name, event.target.value)
+        const { name, value } = event.target;
+        setSecondHitInput({...secondHitInput, [name]: value})
+    }
 
-    //     }
+    //function to add value in second hit input into second hits arr
+    function addSpeciesToArr(e) {
+        e.preventDefault();
+        console.log(secondHitInput.secondHits);
+        if (secondHitInput.secondHits.length > 0) {
+            secondHitsArr.push(secondHitInput.secondHits)
+        }
+        console.log(secondHitsArr)
+    }
 
-    // }
+    //function that sets the second hit state
+    function handleSecondHitState(event){
+        console.log("inside setSecondHitState")
+        setSecondHits({...secondHits, secondHitsArr})
+        console.log(secondHits)
+    }
 
+    //NEXT POINT IN TRANSECT
     //when the form is submitted, use API.addPoint method to save the project data
     //then navigate to a new Point Data Record page, with point incremented by 0.25
     function handlePointFormSubmitNext(event) {
         event.preventDefault(pointFormObject.firstHit)
         console.log(pointFormObject)
-            API.addPoint({
+        handleSecondHitState()
+        API.addPoint({
                 point: pointFormObject.point,
                 ground_surface: pointFormObject.groundSurface,
                 soil_moisture_percentage: pointFormObject.soilMoisture,
                 shrub_density: pointFormObject.shrubDensity,
                 canopy_score: pointFormObject.canopyScore,
-                hit_one: pointFormObject.firstHit,//need to figure out what to put here so the values are submitted
-                hit_two: pointFormObject.secondHit,//need to figure out what to put here so the values are submitted
+                hit_one: pointFormObject.firstHit,
+                hit_two: secondHits,
                 transectID: _id //this is the transect that I am adding the point to
             })
             .then(() => 
             
             {   const newPoint = parseFloat(pointFormObject.point) + 0.25
-                
+                                
                 setPointFormObject({
                 point: newPoint,
                 groundSurface: "",
@@ -118,14 +113,13 @@ const RecordData = () => {
                 shrubDensity: "",
                 canopyScore: "",
                 firstHit: "",
-                secondHit: ""
             })})
                 .catch(err => console.log(err))
         
     };
 
-
-       //when the form is submitted, use API.addPoint method to save the project data
+    //END TRANSECT
+    //when the form is submitted, use API.addPoint method to save the project data
     //then navigate to the projects page
     function handlePointFormSubmitEnd(event) {
         event.preventDefault()
@@ -137,7 +131,7 @@ const RecordData = () => {
                 shrub_density: pointFormObject.shrubDensity,
                 canopy_score: pointFormObject.canopyScore,
                 hit_one: pointFormObject.firstHit,
-                hit_two: pointFormObject.secondHit,
+                hit_two: pointFormObject.secondHits,
                 transectID: _id //this is the transect that I am adding the point to
             })
                 .then(history.push('/projects'))
@@ -202,8 +196,24 @@ const RecordData = () => {
                 
                 <div className="form-group">
                     <label>second hit(s)</label>
-                    <MultiSpeciesList />
-                
+                    <form
+                        className="form-group"
+                        onSubmit={addSpeciesToArr}
+                    >
+                        <input
+                        value={secondHitInput.secondHits}
+                        name="secondHits"
+                        className="form-control"
+                        id="secondHits"
+                        onChange={handleSecondHitChange}
+                        ></input>
+                        <input
+                        type="submit"
+                        value="+"
+                        className="btn btn-dark"
+                        />
+                        
+                    </form>
                 </div>
 
             </div>
