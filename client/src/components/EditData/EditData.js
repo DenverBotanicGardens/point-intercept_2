@@ -1,8 +1,9 @@
 //dependencies
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from 'react-router-dom'
 import API from "../../utils/API";
 import Table from './Table'
+import { useTable } from 'react-table'
 
 const EditProjectData = () => {
 
@@ -13,9 +14,6 @@ const EditProjectData = () => {
     //setting component's initial state
     //hook for state where project title is displayed
     const [project, setProject] =useState([])
-    //hook for table data
-    const [data, setData] = useState([]);
-
 
     //display the project title once the component mounts
     useEffect(() => {
@@ -30,14 +28,14 @@ const EditProjectData = () => {
     //create the empty array for table data to be stored in
     const tableDataArr = []
 
-    //format the project's data to display in the table
+    //get data from database and construct an object for every row of table
     useEffect(() => {
         //Get method for pulling data by project ID
         API.getProjectData(_id)
         .then(res => {
             let tableTransects = res.data.transects
             class TableData {
-                constructor(transect, date, latitude, longitude, elevation, crew, additionalSpecies, point, ground_surface, soil_moisture_percentage, shrub_density_detail, canopy_score, canopy_taxa, hit_one, hit_two, point_id){
+                constructor(transect, date, latitude, longitude, elevation, crew, additionalSpecies, point, ground_surface, soil_moisture_percentage, shrub_density_detail, canopy_score, canopy_taxa, hit_one, hit_two, point_id, transect_id){
                     this.transect = transect;
                     this.date = date;
                     this.latitude = latitude;
@@ -54,6 +52,7 @@ const EditProjectData = () => {
                     this.hit_one = hit_one;
                     this.hit_two = hit_two;
                     this.point_id = point_id;
+                    this.transect_id = transect_id
                 }
             }
             tableTransects.forEach(tableTransect => {
@@ -74,40 +73,162 @@ const EditProjectData = () => {
                         tableTransect.points[j].canopy_taxa,
                         tableTransect.points[j].hit_one,
                         tableTransect.points[j].hit_two,
-                        tableTransect.points[j]._id
+                        tableTransect.points[j]._id,
+                        tableTransect._id
                         ))
                 }
             })
-            //console.log(tableDataArr)
-            setData(tableDataArr)
         })
         .catch(err => console.log(err))
     }, [])
-    
 
+    //define the data for the table
+    const data = React.useMemo(() => tableDataArr, [])
+
+    //define the columns for the table
+    const columns = React.useMemo(
+        () => [
+            {
+                Header: 'transect',
+                accessor: 'transect'
+            },
+            {
+                Header: 'date',
+                accessor: 'date'
+            },
+            {
+                Header: 'point',
+                accessor: 'point'
+            },
+            {
+                Header: 'first hit',
+                accessor: 'hit_one'
+            },
+            {
+                Header: 'second hit',
+                accessor: 'hit_two'
+            },
+            {
+                Header: 'ground surface',
+                accessor: 'ground_surface'
+            },
+            {
+                Header: 'soil moisture %',
+                accessor: 'soil_moisture_percentage'
+            },
+            {
+                Header: 'canopy score',
+                accessor: 'canopy_score'
+            },
+            {
+                Header: 'canopy taxa',
+                accessor: 'canopy_taxa'
+            },
+            {
+                Header: 'shrub density detail',
+                accessor: 'shrub_density_detail'
+            },
+            {
+                Header: 'additional species',
+                accessor: 'additionalSpecies'
+            },
+            {
+                Header: 'crew',
+                accessor: 'crew'
+            },
+            {
+                Header: 'latitude',
+                accessor: 'latitude'
+            },
+            {
+                Header: 'longitude',
+                accessor: 'longitude'
+            },
+            {
+                Header: 'elevation',
+                accessor: 'elevation'
+            }
+
+          ],
+          []
+        )
+    
+        //hook to create instance of table
+        // const tableInstance = useTable({ columns, data })
+
+        // const {
+        //     getTableProps,
+        //     getTableBodyProps,
+        //     headerGroups,
+        //     rows,
+        //     prepareRow,
+        //   } = tableInstance
+
+          const {
+            getTableProps,
+            getTableBodyProps,
+            headerGroups,
+            rows,
+            prepareRow,
+          } = useTable({ columns, data })
+
+    
     return (
         <>
+        
+            <table {...getTableProps()} style={{ border: 'solid 1px blue' }}>
+            <thead>
+                {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map(column => (
+                    <th
+                        {...column.getHeaderProps()}
+                        style={{
+                        borderBottom: 'solid 3px red',
+                        background: 'aliceblue',
+                        color: 'black',
+                        fontWeight: 'bold',
+                        }}
+                    >
+                        {column.render('Header')}
+                    </th>
+                    ))}
+                </tr>
+                ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+                {rows.map(row => {
+                prepareRow(row)
+                return (
+                    <tr {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                        return (
+                        <td
+                            {...cell.getCellProps()}
+                            style={{
+                            padding: '10px',
+                            border: 'solid 1px gray',
+                            background: 'papayawhip',
+                            }}
+                        >
+                            {cell.render('Cell')}
+                        </td>
+                        )
+                    })}
+                    </tr>
+                )
+                })}
+            </tbody>
+            </table>
+
+
+
+{/* 
             <Table
                 id={project._id}
                 project={project.project}
                 data={data}
-                editable={{
-                    onRowUpdate: (newData, oldData) =>
-                    new Promise((resolve, reject) => {
-                        setTimeout(() => {
-                          console.log("butts")
-                          const dataUpdate = [...data];
-                          const index = oldData.tableData.id;
-                          dataUpdate[index] = newData;
-                          setData([...dataUpdate]);
-            
-                          resolve();
-                        }, 1000)
-                      })
-
-                  }}
-            
-            />
+            /> */}
         </>
     )
 }
