@@ -8,9 +8,9 @@ const Table = (props) => {
 
     const columns: ColDef[] = [
         { field: 'transect', headerName: 'transect', width: 150 },
-        { field: 'date', headerName: 'date', width: 150 },
+        { field: 'date', headerName: 'date', width: 115 },
         { field: 'point', headerName: 'point', width: 150 },
-        { field: 'hit_one', headerName: 'first hit', width: 150 },
+        { field: 'hit_one', headerName: 'first hit', width: 200 },
         { field: 'hit_two', headerName: 'second hit(s)', width: 350 },
         { field: 'ground_surface', headerName: 'groud surface', width: 150 },
         { field: 'soil_moisture_percentage', headerName: 'soil moisture %', width: 150 },
@@ -18,8 +18,8 @@ const Table = (props) => {
         { field: 'canopy_taxa', headerName: 'canopy taxa', width: 450 },
         { field: 'shrub_density_detail', headerName: 'shrub detail', width: 450 },
         { field: 'additionalSpecies', headerName: 'add\'l taxa', width: 350 },
-        { field: 'latitude', headerName: 'latitude', width: 150 },
-        { field: 'longitude', headerName: 'longitude', width: 150 },
+        { field: 'latitude', headerName: 'latitude', width: 175 },
+        { field: 'longitude', headerName: 'longitude', width: 175 },
         { field: 'elevation', headerName: 'elevation(m)', width: 150 },
         { field: 'crew', headerName: 'crew', width: 450 },
       ];
@@ -27,7 +27,12 @@ const Table = (props) => {
     return(
         <>
             <div style={{ height: 300, width: "100%" }}>
-            <DataGrid rows={rows} columns={columns} />
+            <DataGrid
+                rows={rows}
+                columns={columns}
+                autoHeight={true}
+                showToolbar
+                />
             </div>
         </>
     )
