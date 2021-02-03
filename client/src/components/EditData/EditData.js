@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from 'react-router-dom'
 import API from "../../utils/API";
-import Table from './Table.tsx'
+//import MUIDataGrid from './MUIDataGrid.tsx'
 const EditProjectData = () => {
 
     //get _id param (transectID) so that it can be accessed to for displaying data and for adding transect name
@@ -89,7 +89,8 @@ const EditProjectData = () => {
     return (
         <>
             <h3>{project.project}</h3>
-            <Table
+
+            {/* <MUIDataGrid
                 id={project._id}
                 project={project.project}
                 data={data}
@@ -111,7 +112,7 @@ const EditProjectData = () => {
                       prop: "email"
                     }
                   ]}
-            />
+            /> */}
         </>
     )
 }

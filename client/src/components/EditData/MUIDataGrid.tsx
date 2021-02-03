@@ -2,7 +2,7 @@
 import React from 'react'
 import { DataGrid, RowsProp, ColDef } from '@material-ui/data-grid';
 
-const Table = (props) => {
+const MUIDataGrid = (props) => {
     console.log(props.data)
     const rows: RowsProp = props.data;
 
@@ -38,4 +38,4 @@ const Table = (props) => {
     )
 }
 
-export default Table
+export default MUIDataGrid
