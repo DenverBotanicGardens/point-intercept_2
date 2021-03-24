@@ -20,6 +20,10 @@ const GetData = () => {
     const [project, setProject] =useState([])
     //hook for state of data to be downloaded as csv
     const [data, setData] = useState([])
+    //hook for state of darwin core EVENT data to be downloaded as csv
+    const [eventData, setEventData] = useState([])
+    //hook for state of darwin core OCCURRENCE data to be downloaded as csv
+    const [occurrenceData, setOccurrenceData] = useState([])
     //hook for state of data for the charts
     const [chartData, setChartData] = useState([])
     //hook for state of top canopy taxa chart data
@@ -73,6 +77,170 @@ const GetData = () => {
                     }
                 })
                 setData(csvData)
+            })
+            .catch(err => console.log(err))
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    //run the function that calls tha API and creates the formatted data for the darwinCore occurrence data csv
+    useEffect(() => {
+        API.getProjectData(_id)
+            .then(res => {
+                let csvOccurrenceData = []
+                csvOccurrenceData.push([
+                    "occurrenceID",
+                    "eventID",
+                    "institutionID",
+                    "institutionCode",
+                    "basisOfRecord",
+                    "occurrenceRemarks",
+                    "recordedBy",
+                    "individualCount",
+                    "occurrenceStatus",
+                    "identifiedBy",
+                    "dateIdentified",
+                    "identificationReferences",
+                    "identificationRemarks",
+                    "scientificName",
+                    "kingdom",
+                    "phylum",
+                    "class",
+                    "order",
+                    "family",
+                    "genus",
+                    "specificEpithet",
+                    "infraspecificEpithet",
+                    "taxonRank",
+                    "scientificNameAuthorship"
+                ])
+                let transects = res.data.transects
+                transects.forEach(function(transect) {
+                    //code for adding occurrnces based on FIRST HITS
+                    for (var j = 0; j < transect.points.length; j++){
+                        //create an array and add data to it for the csv
+                        var firstHitsArr = []
+                        firstHitsArr.push("") // occurrenceID
+                        firstHitsArr.push(transect._id) // eventID
+                        firstHitsArr.push("") // institutionID
+                        firstHitsArr.push("") // institutionCode
+                        firstHitsArr.push("HumanObservation") // basisOfRecord
+                        firstHitsArr.push(`Recorded as top canopy ground vegetation within the transect at the ${transect.points[j].point} meter mark.`) // occurrenceRemarks
+                        firstHitsArr.push(transect.crew) // recordedBy
+                        firstHitsArr.push("1") // individualCount
+                        firstHitsArr.push("present") // occurrenceStatus
+                        firstHitsArr.push("") // identifiedBy
+                        firstHitsArr.push("") // dateIdentified
+                        firstHitsArr.push("") // identificationReferences
+                        firstHitsArr.push("") // identificationRemarks
+                        firstHitsArr.push(transect.points[j].hit_one) // scientificName
+                        firstHitsArr.push("") // kingdom
+                        firstHitsArr.push("") // phylum
+                        firstHitsArr.push("") // class
+                        firstHitsArr.push("") // order
+                        firstHitsArr.push("") // family
+                        firstHitsArr.push("") // genus
+                        firstHitsArr.push("") // specificEpithet
+                        firstHitsArr.push("") // infraspecificEpithet
+                        firstHitsArr.push("") // taxonRank
+                        firstHitsArr.push("") // scientificNameAuthorship
+                        csvOccurrenceData.push(firstHitsArr)
+                    }
+                    //code for adding occurrnces based on SECOND HITS
+                    for (var i = 0; i < transect.points.length; i++){
+                        //create an array and add data to it for the csv
+                        var secondHitsArr = []
+                        secondHitsArr.push("") // occurrenceID
+                        secondHitsArr.push(transect._id) // eventID
+                        secondHitsArr.push("") // institutionID
+                        secondHitsArr.push("") // institutionCode
+                        secondHitsArr.push("HumanObservation") // basisOfRecord
+                        secondHitsArr.push(`Recorded as lower canopy ground vegetation within the transect at the ${transect.points[i].point} meter mark.`) // occurrenceRemarks
+                        secondHitsArr.push(transect.crew) // recordedBy
+                        secondHitsArr.push("1") // individualCount
+                        secondHitsArr.push("present") // occurrenceStatus
+                        secondHitsArr.push("") // identifiedBy
+                        secondHitsArr.push("") // dateIdentified
+                        secondHitsArr.push("") // identificationReferences
+                        secondHitsArr.push("") // identificationRemarks
+                        secondHitsArr.push(transect.points[i].hit_two) // scientificName
+                        secondHitsArr.push("") // kingdom
+                        secondHitsArr.push("") // phylum
+                        secondHitsArr.push("") // class
+                        secondHitsArr.push("") // order
+                        secondHitsArr.push("") // genus
+                        secondHitsArr.push("") // specificEpithet
+                        secondHitsArr.push("") // infraspecificEpithet
+                        secondHitsArr.push("") // taxonRank
+                        secondHitsArr.push("") // scientificNameAuthorship
+                        csvOccurrenceData.push(secondHitsArr)
+                    }
+                })
+                console.log(csvOccurrenceData)
+                setOccurrenceData(csvOccurrenceData)
+            })
+            .catch(err => console.log(err))
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    //run the function that calls the API and creates the formatted data for the darwinCore event data csv
+    useEffect(() => {
+        API.getProjectData(_id)
+            .then(res => {
+                let csvEventData = []
+                csvEventData.push([
+                "eventID",
+                "samplingProtocol",
+                "sampleSizeValue",
+                "sampleSizeUnit",
+                "samplingEffort",
+                "eventDate",
+                "year",
+                "month",
+                "day",
+                "habitat",
+                "eventRemarks",
+                "locationID",
+                "country",
+                "countryCode",
+                "stateProvince",
+                "county",
+                "municipality",
+                "locality",
+                "decimalLatitude",
+                "decimalLongitude",
+                "geodeticDatum",
+                "minimumElevationInMeters"])
+                let transects = res.data.transects
+                transects.forEach(function(transect) {
+                    //calculate the transect length
+                    var transectLength = (transect.points.length - 1)/4
+                    //create an array and add data to it for the csv
+                    var arr = []
+                    arr.push(transect._id) //eventID
+                    arr.push("") //samplingProtocol
+                    arr.push(transectLength) //sampleSizeValue
+                    arr.push("metre") //sampleSizeUnit
+                    arr.push("") //samplingEffort
+                    arr.push(moment(transect.date).tz('UTC').format('YYYY-MM-DD')) //eventData
+                    arr.push(moment(transect.date).tz('UTC').format('YYYY')) //year
+                    arr.push(moment(transect.date).tz('UTC').format('MMMM')) //month
+                    arr.push(moment(transect.date).tz('UTC').format('D')) //day
+                    arr.push("") //habitat
+                    arr.push("") //eventRemarks
+                    arr.push(transect.transect) //locationID
+                    arr.push("") //country
+                    arr.push("") //countryCode
+                    arr.push("") //stateProvince
+                    arr.push("") //county
+                    arr.push("") //municipality
+                    arr.push("") //locality
+                    arr.push(transect.latitude) //decimalLatitude
+                    arr.push(transect.longitude) //decimalLongitude
+                    arr.push("WGS84") //geodeticDatum
+                    arr.push(transect.elevation) //minimumElevationInMeters
+                    csvEventData.push(arr)
+                })
+                setEventData(csvEventData)
             })
             .catch(err => console.log(err))
             // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -253,6 +421,22 @@ const GetData = () => {
             filename={`${project.project}_point-intercept_data.csv`}
             >
                 download csv
+            </CSVLink>
+            <br></br>
+            <CSVLink
+            data={eventData}
+            className="btn btn-lg btn-dark m-1"
+            filename={`${project.project}_event.csv`}
+            >
+                download DwC: event
+            </CSVLink>
+
+            <CSVLink
+            data={occurrenceData}
+            className="btn btn-lg btn-dark m-1"
+            filename={`${project.project}occurrence.csv`}
+            >
+                download DwC: occurrence
             </CSVLink>
             <br/>
         </>
