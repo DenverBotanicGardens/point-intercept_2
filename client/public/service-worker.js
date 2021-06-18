@@ -1,5 +1,7 @@
 const FILES_TO_CACHE = [
-
+  '/',
+  '/about',
+  'p-i_logo.png'
 ];
 
 const CACHE_NAME = "static-cache-v2"

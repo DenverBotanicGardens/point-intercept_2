@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Connect to the Mongo DB
-mongoose.connect(process.env.MONGODB_URI);
+mongoose.connect("mongodb://localhost/point-intercept");
 //"mongodb://localhost/point-intercept"
 //"process.env.MONGODB_URI"
 
