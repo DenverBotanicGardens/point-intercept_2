@@ -18,8 +18,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // configure middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }, {limit: '50mb'}));
+app.use(express.json({limit: '50mb'}));
 
 // Add routes, both API and view
 app.use(routes);
@@ -30,10 +30,11 @@ if (process.env.NODE_ENV === 'production') {
     app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'client', 'build', 'index.html')));
 }
 
-// Connect to the Mongo DB
+// // Connect to the local instance of mongoDB
+// mongoose.connect("mongodb://localhost/point-intercept");
+
+// Connect to atlas mongoDB
 mongoose.connect(process.env.MONGODB_URI);
-//"mongodb://localhost/point-intercept"
-//"process.env.MONGODB_URI"
 
 // start the server
 app.listen(PORT, function () {
